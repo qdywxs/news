@@ -26,29 +26,16 @@
 </head>
 <body>
   <div class="container">
-    <ul class="news">
-      <!-- <li>我是新闻</li> -->
-    </ul>
+    <ul class="news"></ul>
     <button id="change">换一组</button>
   </div>
 
   <script>
-    //声明一个函数，让其只做一件事——获取数据:
-    function getNews(callback) {  //❗️注意这里“形参”——回调函数的用意！
-      //1️⃣首先，通过 AJAX 去获取数据：
+    function getNews(callback) {
       var xhr = new XMLHttpRequest()
       xhr.open('GET', '/getNews', true) 
-      
-      //2️⃣数据到来后：
       xhr.onload = function() {
-        //2️⃣-①：数据到来后，首先将后端传来的 JSON 格式的字符串转换为对象，以便对其进行操作。
         var newsJson = JSON.parse(xhr.responseText)
-        
-        //2️⃣-②：对转换后的数据操作，我们放在另外的函数进行。
-        /*❗️之所以我们会用一个“回调函数”，是因为：对于这得到的、且转换成对象的数据，
-        我们可以进行很多的操作。我们可以直接去渲染这个数据，
-        但也可以对数据做类似“筛选掉 12 小时前的新闻”等操作。
-        */
         callback(newsJson)
       }
       xhr.send()  
@@ -56,8 +43,7 @@
 
     getNews(function(news) {
       renderNews(news)
-    })  /*❗️当我们去调用这个函数时，我们就可以在这里定义我们需要对数据进行哪些操作。
-        这样我们就可以在大局上有一个把握！*/
+    })
 
 
     var newsContainer = document.querySelector('.news')
@@ -65,27 +51,10 @@
 
 
     function renderNews(news) {
-      /*❗️由于每次我们都是重新渲染这个页面，
-      故我们每一次渲染的开始，都得将页面上的元素清除！*/
       newsContainer.innerHTML = '' 
-      
-      /*❗️❗️❗️下面我们就需要创建一些节点放在这个 newsContainer 上。
-      可选的方法有很多：
-      ①直接创建一个把它放进去，然后再创建一个把它放进去……
-      ②也可以一次性地去拼接这个 HTML 字符串，拼接好后，一次性地放在 newsContainer 里；
-      ③✅还可以把我们创建的这个 DOM 节点放在一个虚拟的 DOM 节点上。然后再把这个虚拟节点一次性地
-        放在这个 newsContainer 里。
-        
-      这里我们选择第③种，因为它可以让页面性能最优——不会重复地渲染页面。
-      */
-      /*document.createDocumentFragment() 方法用来生成一个存在于内存的 dom 片段（虚拟生成），
-      但不属于当前文档，即不会生成一个标签。常用于生成复杂的 dom 结构，然后插入当前文档。
-      正因为它不属于当前文档，所以并不参与页面渲染加载的过程，它的任何改动都不会引发网页的重新渲染。
-      比直接修改当前文档的 DOM 有更好的性能表现。
-      */
+
       var fragement = document.createDocumentFragment()
       
-      //❗️通过 forEach(callback, thisValue) 方法来遍历数组中的元素：
       news.forEach(function(newsStr) {  
         var node = document.createElement('li')
         node.innerText = newsStr
@@ -95,10 +64,7 @@
     }
 
 
-    //绑定点击事件：
     changeBtn.onclick = function() {
-      
-      //得到数据，然后渲染数据！
       getNews(function(news){
         renderNews(news)
       })
